@@ -3,6 +3,17 @@ API="https://api.telegram.org/bot$TOKEN/"
 
 Channel="" # Telegram channel to send messages
 
+urlencode() {
+    local length="${#1}"
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-]) printf "$c" ;;
+            *) printf '%%%02X' "'$c" ;;
+        esac
+    done
+}
+
 request() {
     local URL="$API$1"
 
@@ -18,7 +29,8 @@ checkToken() {
 }
 
 sendMessage() {
-    request "sendMessage?chat_id=$1&text=$2&parse_mode=Markdown"
+    message=$(urlencode $2)
+    request "sendMessage?chat_id=$1&text=$message&parse_mode=Markdown"
 }
 
 checkToken
